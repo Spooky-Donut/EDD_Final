@@ -1,4 +1,4 @@
-# EDD_Final
+# MineVenture
 
 Juan Romero
 
