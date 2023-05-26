@@ -1,6 +1,7 @@
 import pygame, sys
 import math
 import random
+import time
 from button import Button
 
 
@@ -185,6 +186,10 @@ setup(cell_size)
 # ---------------------------------------------------------------------------------------------------
 
 
+start_time = 0
+elapsed_time = 0
+paused = False
+sw = 0
 x = 550
 y = 380
 width_rect=800
@@ -207,7 +212,8 @@ nuevo_alto = 40
 imagen_redimensionada = pygame.transform.scale(bandera, (nuevo_ancho, nuevo_alto))
 BG = pygame.image.load("FondoPausa.png")
 
-def pausa():
+def pausa(sw, paused, start_time, elapsed_time):
+    paused_elapsed_time = elapsed_time
     while True:
         SCREEN.blit(BG, (0, 0))
 
@@ -239,11 +245,14 @@ def pausa():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if RESUME_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    game()
+                    paused = not paused
+                    if not paused:
+                        start_time = time.time() - paused_elapsed_time
+                    game(sw, paused, start_time, elapsed_time)
 
         pygame.display.flip()
 
-def game():
+def game(sw, paused, start_time, elapsed_time):
     while True:
         SCREEN.fill(Whithe)
 
@@ -255,7 +264,7 @@ def game():
         Bandera = Button(image=imagen_redimensionada, pos=(650, 320), 
                             text_input="", font=get_font(15), base_color="#d7fcd4", hovering_color="White")
         Time = Button(image=None, pos=(870, 320), 
-                            text_input="TIEMPO", font=get_font(35), base_color="#000000", hovering_color="White")
+                            text_input=f"{elapsed_time}", font=get_font(35), base_color="#000000", hovering_color="White")
         Puntos = Button(image=None, pos=(1150, 320), 
                             text_input="PUNTOS", font=get_font(35), base_color="#000000", hovering_color="White")
 
@@ -268,12 +277,22 @@ def game():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if sw == 0:
+                    start_time = time.time()
+                    sw = 1
                 mousePressed()
                 if PAUSE_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    pausa()
+                    paused = not paused
+                    pausa(sw, paused, start_time, elapsed_time)
+
+
+        
+        if not paused:
+            if sw == 1:            
+                elapsed_time = math.floor(time.time() - start_time)
 
         draw()
 
         pygame.display.flip()
 
-game()
+game(sw, paused, start_time, elapsed_time)
