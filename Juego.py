@@ -6,9 +6,9 @@ from button import Button
 
 
 sys.setrecursionlimit(10000)
-
 pg.display.set_caption("MineVenture")
 pg.display.set_icon(pg.image.load("MinaSinFondoCuadrada.png"))
+
 
 totalBees = 30
 cell_size = 18
@@ -160,12 +160,13 @@ def setup(cell_size):
         for j in range(rows):
             grid[i][j].countBees()
 
-def gameOver():
+def gameOver(elapsed_time):
     for i in range(cols):
         for j in range(rows):
             grid[i][j].revealed = True
+    resumen(elapsed_time, 1)
 
-def mousePressed():
+def mousePressed(elapsed_time):
     mouse_pos = pg.mouse.get_pos()
     mouse_button = pg.mouse.get_pressed()
 
@@ -176,7 +177,7 @@ def mousePressed():
                     if not grid[i][j].flagged:
                         grid[i][j].reveal()
                         if grid[i][j].bee:
-                            gameOver()
+                            gameOver(elapsed_time)
                 elif mouse_button[2]:
                     grid[i][j].flag()
 
@@ -315,7 +316,7 @@ def menu_principal():
                         pg.quit()
                         sys.exit()
                     elif play_button_rect.collidepoint(mouse_pos):
-                        game(0, 0, 0, 0)
+                        game(0, 0, 0, 0, 0)
                     
 
         # RENDER YOUR GAME HERE
@@ -482,7 +483,7 @@ def render_textrect(text, font, rect, text_color, background_color, justificatio
         screen.blit(line_surf, line_rect)
         accumulated_height += line_rect.height
 
-def resumen(tiempo_completado):
+def resumen(tiempo_completado, aux):
     # Crear los rectángulos para los elementos
     rect_felicidades = pg.Rect(100, 200, width - 200, 100)
     rect_tiempo = pg.Rect(100, rect_felicidades.bottom + 20, width - 200, 50)
@@ -491,7 +492,10 @@ def resumen(tiempo_completado):
 
     # Variables para almacenar el nombre del jugador y el mensaje de felicitaciones
     nombre_jugador = ""
-    mensaje_felicidades = "¡Felicidades!"
+    if aux == 1:
+        mensaje_felicidades = "Perdió"
+    else:
+        mensaje_felicidades = "¡Felicidades!"
 
     # Banderas para controlar la entrada de texto del nombre
     nombre_ingresado = False
@@ -528,7 +532,8 @@ def resumen(tiempo_completado):
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if rect_volver.collidepoint(mouse_pos):
                     # Lógica para volver al menú principal
-                    return
+                    setup(18)
+                    menu_principal()
 
             elif event.type == pg.KEYDOWN:
                 if not nombre_ingresado:
@@ -566,7 +571,7 @@ border_width = 10
 Whithe=(255,255,255)
 Black=(0,0,0)
 
-def pausa(sw, paused, start_time, elapsed_time):
+def pausa(sw, paused, start_time, elapsed_time, aux):
     paused_elapsed_time = elapsed_time
     while True:
         screen1.blit(BG, (0, 0))
@@ -602,12 +607,21 @@ def pausa(sw, paused, start_time, elapsed_time):
                     paused = not paused
                     if not paused:
                         start_time = time.time() - paused_elapsed_time
-                    game(sw, paused, start_time, elapsed_time)
+                    game(sw, paused, start_time, elapsed_time, aux)
+                if REINICIAR_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    sw = 0
+                    elapsed_time = 0
+                    setup(18)
+                if MENU_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    menu_principal()
+                if COMOJUGAR_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    instrucciones()
 
         pg.display.flip()
 
-def game(sw, paused, start_time, elapsed_time):
+def game(sw, paused, start_time, elapsed_time, aux):
     while True:
+
         screen1.fill(Whithe)
 
         MENU_MOUSE_POS = pg.mouse.get_pos()
@@ -634,16 +648,18 @@ def game(sw, paused, start_time, elapsed_time):
                 if sw == 0:
                     start_time = time.time()
                     sw = 1
-                mousePressed()
+                mousePressed(elapsed_time)
                 if PAUSE_BUTTON.checkForInput(MENU_MOUSE_POS):
                     paused = not paused
-                    pausa(sw, paused, start_time, elapsed_time)
+                    pausa(sw, paused, start_time, elapsed_time, aux)
 
-
+        if aux ==1:
+            resumen(elapsed_time)
         
         if not paused:
             if sw == 1:            
                 elapsed_time = math.floor(time.time() - start_time)
+
 
         draw()
 
