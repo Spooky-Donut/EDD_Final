@@ -161,10 +161,10 @@ def setup(cell_size):
             grid[i][j].countBees()
 
 def gameOver(elapsed_time):
-    for i in range(cols):
-        for j in range(rows):
-            grid[i][j].revealed = True
-    resumen(elapsed_time, 1)
+        for i in range(cols):
+            for j in range(rows):
+                grid[i][j].revealed = True
+        resumen(elapsed_time, 1)
 
 def mousePressed(elapsed_time):
     mouse_pos = pg.mouse.get_pos()
@@ -181,7 +181,7 @@ def mousePressed(elapsed_time):
                 elif mouse_button[2]:
                     grid[i][j].flag()
 
-setup(cell_size)
+
 
 
 # ---------------------------------------------------------------------------------------------------
@@ -316,7 +316,8 @@ def menu_principal():
                         pg.quit()
                         sys.exit()
                     elif play_button_rect.collidepoint(mouse_pos):
-                        game(0, 0, 0, 0, 0)
+                        setup(18)
+                        game(0, 0, 0, 0)
                     
 
         # RENDER YOUR GAME HERE
@@ -571,7 +572,8 @@ border_width = 10
 Whithe=(255,255,255)
 Black=(0,0,0)
 
-def pausa(sw, paused, start_time, elapsed_time, aux):
+
+def pausa(sw, paused, start_time, elapsed_time):
     paused_elapsed_time = elapsed_time
     while True:
         screen1.blit(BG, (0, 0))
@@ -607,7 +609,7 @@ def pausa(sw, paused, start_time, elapsed_time, aux):
                     paused = not paused
                     if not paused:
                         start_time = time.time() - paused_elapsed_time
-                    game(sw, paused, start_time, elapsed_time, aux)
+                    game(sw, paused, start_time, elapsed_time)
                 if REINICIAR_BUTTON.checkForInput(MENU_MOUSE_POS):
                     sw = 0
                     elapsed_time = 0
@@ -619,7 +621,7 @@ def pausa(sw, paused, start_time, elapsed_time, aux):
 
         pg.display.flip()
 
-def game(sw, paused, start_time, elapsed_time, aux):
+def game(sw, paused, start_time, elapsed_time):
     while True:
 
         screen1.fill(Whithe)
@@ -651,10 +653,8 @@ def game(sw, paused, start_time, elapsed_time, aux):
                 mousePressed(elapsed_time)
                 if PAUSE_BUTTON.checkForInput(MENU_MOUSE_POS):
                     paused = not paused
-                    pausa(sw, paused, start_time, elapsed_time, aux)
+                    pausa(sw, paused, start_time, elapsed_time)
 
-        if aux ==1:
-            resumen(elapsed_time)
         
         if not paused:
             if sw == 1:            
