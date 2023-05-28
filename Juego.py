@@ -106,15 +106,17 @@ class Cell:
     def contains(self, x, y):
         return self.x + 563 < x < self.x + 563 + self.w and self.y + 395 < y < self.y + 395 + self.w
 
-    def reveal(self):
+    def reveal(self, tiempo_completado, cell_size):
         if self.flagged:
             return None
         else:
             self.revealed = True
+            if checkWin():
+                resumen(tiempo_completado, 2, cell_size)
             if self.neighborCount == 0:
-                self.floodFill()
+                self.floodFill(tiempo_completado, cell_size)
 
-    def floodFill(self):
+    def floodFill(self, tiempo_completado, cell_size):
         for xoff in range(-1, 2):
             i = self.i + xoff
             if i < 0 or i >= cols:
@@ -125,7 +127,7 @@ class Cell:
                     continue
                 neighbor = grid[i][j]
                 if not neighbor.revealed:
-                    neighbor.reveal()
+                    neighbor.reveal(tiempo_completado, cell_size)
 
 def make2DArray(cols, rows):
     arr = [[None for _ in range(rows)] for _ in range(cols)]
@@ -160,13 +162,22 @@ def setup(cell_size):
         for j in range(rows):
             grid[i][j].countBees()
 
-def gameOver(elapsed_time):
+def checkWin():
+    cols = math.floor(780 / cell_size)
+    rows = math.floor(480 / cell_size)
+    for i in range(cols):
+            for j in range(rows):
+                if not grid[i][j].revealed and not grid[i][j].bee:
+                    return False
+    return True
+
+def gameOver(elapsed_time, cell_size):
         for i in range(cols):
             for j in range(rows):
                 grid[i][j].revealed = True
-        resumen(elapsed_time, 1)
+        resumen(elapsed_time, 1, cell_size)
 
-def mousePressed(elapsed_time):
+def mousePressed(elapsed_time, cell_size):
     mouse_pos = pg.mouse.get_pos()
     mouse_button = pg.mouse.get_pressed()
 
@@ -175,9 +186,9 @@ def mousePressed(elapsed_time):
             if grid[i][j].contains(mouse_pos[0], mouse_pos[1]):
                 if mouse_button[0]:
                     if not grid[i][j].flagged:
-                        grid[i][j].reveal()
+                        grid[i][j].reveal(elapsed_time, cell_size)
                         if grid[i][j].bee:
-                            gameOver(elapsed_time)
+                            gameOver(elapsed_time, cell_size)
                 elif mouse_button[2]:
                     grid[i][j].flag()
 
@@ -293,7 +304,7 @@ BG = pg.image.load("FondoPausa.png")
 def get_font(size): 
     return pg.font.Font("pixel.ttf", size)
 
-def menu_principal():
+def menu_principal(cell_size):
     
     clock = pg.time.Clock()
     running = True
@@ -316,8 +327,8 @@ def menu_principal():
                         pg.quit()
                         sys.exit()
                     elif play_button_rect.collidepoint(mouse_pos):
-                        setup(18)
-                        game(0, 0, 0, 0)
+                        setup(cell_size)
+                        game(0, 0, 0, 0, cell_size)
                     
 
         # RENDER YOUR GAME HERE
@@ -484,7 +495,7 @@ def render_textrect(text, font, rect, text_color, background_color, justificatio
         screen.blit(line_surf, line_rect)
         accumulated_height += line_rect.height
 
-def resumen(tiempo_completado, aux):
+def resumen(tiempo_completado, aux, cell_size):
     # Crear los rectángulos para los elementos
     rect_felicidades = pg.Rect(100, 200, width - 200, 100)
     rect_tiempo = pg.Rect(100, rect_felicidades.bottom + 20, width - 200, 50)
@@ -533,8 +544,8 @@ def resumen(tiempo_completado, aux):
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if rect_volver.collidepoint(mouse_pos):
                     # Lógica para volver al menú principal
-                    setup(18)
-                    menu_principal()
+                    setup(cell_size)
+                    menu_principal(cell_size)
 
             elif event.type == pg.KEYDOWN:
                 if not nombre_ingresado:
@@ -573,7 +584,7 @@ Whithe=(255,255,255)
 Black=(0,0,0)
 
 
-def pausa(sw, paused, start_time, elapsed_time):
+def pausa(sw, paused, start_time, elapsed_time, cell_size):
     paused_elapsed_time = elapsed_time
     while True:
         screen1.blit(BG, (0, 0))
@@ -609,19 +620,19 @@ def pausa(sw, paused, start_time, elapsed_time):
                     paused = not paused
                     if not paused:
                         start_time = time.time() - paused_elapsed_time
-                    game(sw, paused, start_time, elapsed_time)
+                    game(sw, paused, start_time, elapsed_time, cell_size)
                 if REINICIAR_BUTTON.checkForInput(MENU_MOUSE_POS):
                     sw = 0
                     elapsed_time = 0
-                    setup(18)
+                    setup(cell_size)
                 if MENU_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    menu_principal()
+                    menu_principal(cell_size)
                 if COMOJUGAR_BUTTON.checkForInput(MENU_MOUSE_POS):
                     instrucciones()
 
         pg.display.flip()
 
-def game(sw, paused, start_time, elapsed_time):
+def game(sw, paused, start_time, elapsed_time, cell_size):
     while True:
 
         screen1.fill(Whithe)
@@ -650,10 +661,10 @@ def game(sw, paused, start_time, elapsed_time):
                 if sw == 0:
                     start_time = time.time()
                     sw = 1
-                mousePressed(elapsed_time)
+                mousePressed(elapsed_time, cell_size)
                 if PAUSE_BUTTON.checkForInput(MENU_MOUSE_POS):
                     paused = not paused
-                    pausa(sw, paused, start_time, elapsed_time)
+                    pausa(sw, paused, start_time, elapsed_time, cell_size)
 
         
         if not paused:
@@ -665,4 +676,4 @@ def game(sw, paused, start_time, elapsed_time):
 
         pg.display.flip()
 
-menu_principal()
+menu_principal(cell_size)
