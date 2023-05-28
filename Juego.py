@@ -444,6 +444,18 @@ def instrucciones():
 
 def estadisticas():
     estadisticas_texto =""
+    try:
+        with open('Registros.txt', 'r') as file:
+            # Leer cada línea del archivo hasta que no haya más
+            linea = file.readline()
+            while linea:
+                # Procesar la línea como un registro
+                registro = linea.strip().split(',')
+                # Hacer algo con el registro
+                estadisticas_texto += ', '.join(registro) + ' segundos' '\n'
+
+                # Leer la siguiente línea
+                linea = file.readline()
     font_estadisticas = pg.font.Font("pixel.ttf", 24)  
     rect_estadisticas = pg.Rect(width*0.01, height/9.5, width, height)
 
@@ -543,6 +555,9 @@ def resumen(tiempo_completado, aux, cell_size):
                 pg.quit()               
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if rect_volver.collidepoint(mouse_pos):
+                    if aux == 2:
+                        guardar_registro(
+                            nombre_jugador, int(tiempo_completado))
                     # Lógica para volver al menú principal
                     setup(cell_size)
                     menu_principal(cell_size)
@@ -583,6 +598,36 @@ border_width = 10
 Whithe=(255,255,255)
 Black=(0,0,0)
 
+def guardar_registro(nombre, puntuacion):
+    # Crear el registro con el formato "nombre,puntuacion"
+    registro = f"{nombre},{puntuacion}"
+
+    try:
+        # Abrir el archivo en modo lectura
+        with open('Registros.txt', 'r') as file:
+            # Leer los registros existentes
+            registros = file.readlines()
+
+        # Agregar el nuevo registro a la lista
+        registros.append(registro + '\n')
+
+        # Ordenar los registros de mayor a menor
+        registros.sort(key=lambda x: int(x.split(',')[1]), reverse=False)
+
+        # Tomar solo los primeros 5 registros si hay más de 5
+        registros = registros[:5]
+
+        # Abrir el archivo en modo escritura
+        with open('Registros.txt', 'w') as file:
+            # Escribir los registros ordenados en el archivo
+            file.writelines(registros)
+
+        print("Registro guardado correctamente.")
+    except FileNotFoundError:
+        with open('Registros.txt', 'w') as file:
+            # Escribir el nuevo registro en el archivo vacío
+            file.write(registro + '\n')
+        print("Archivo creado y registro guardado correctamente.")
 
 def pausa(sw, paused, start_time, elapsed_time, cell_size):
     paused_elapsed_time = elapsed_time
