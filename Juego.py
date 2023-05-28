@@ -456,6 +456,10 @@ def estadisticas():
 
                 # Leer la siguiente línea
                 linea = file.readline()
+
+    except FileNotFoundError:
+        estadisticas_texto = "Actualmente no hay registros de partidas anteriores"
+    
     font_estadisticas = pg.font.Font("pixel.ttf", 24)  
     rect_estadisticas = pg.Rect(width*0.01, height/9.5, width, height)
 
