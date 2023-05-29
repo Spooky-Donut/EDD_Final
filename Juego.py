@@ -364,7 +364,7 @@ def menu_principal(cell_size, totalBees):
         screen.blit(button_close, button_close_rect)
         screen.blit(text_close, text_close_rect)
 
-        screen.blit(play_button, (width/2.76, height/2.6))
+        screen.blit(play_button, (width/2.5, height/2.6))
 
         screen.blit(button_statistics, button_statistics_rect)
         screen.blit(text_statistics, text_statistics_rect)
@@ -402,7 +402,7 @@ def creditos():
                      "        - Jairo Luis Moreno Gutierrez: Director de Documentación \n\n"
 
     font_creditos = pg.font.Font("pixel.ttf", 24)
-    rect_creditos = pg.Rect(width/3.5, height/10, width, height)
+    rect_creditos = pg.Rect(width/3.5, height/6, width, height)
 
     volver_button = font_button.render("VOLVER", True, BLACK)
     volver_button_rect = volver_button.get_rect()
@@ -415,7 +415,7 @@ def creditos():
                         rect_creditos, BLACK, None, justification=0)
         screen.blit(volver_button, volver_button_rect)
         pg.draw.line(screen, BLACK, (volver_button_rect.x, volver_button_rect.y + 30),
-                     (volver_button_rect.x + width/12.5, volver_button_rect.y + 30), 3)
+                     (volver_button_rect.x + width * 0.057, volver_button_rect.y + 30), 3)
         pg.display.flip()
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -459,7 +459,7 @@ def instrucciones():
                         rect_instrucciones, BLACK, None, justification=0)
         screen.blit(volver_button, volver_button_rect)
         pg.draw.line(screen, BLACK, (volver_button_rect.x, volver_button_rect.y + 30),
-                     (volver_button_rect.x + width/12.5, volver_button_rect.y + 30), 3)
+                     (volver_button_rect.x + width * 0.057, volver_button_rect.y + 30), 3)
 
         pg.display.flip()
 
@@ -493,7 +493,7 @@ def estadisticas():
         estadisticas_texto = "Actualmente no hay registros de partidas anteriores"
 
     font_estadisticas = pg.font.Font("pixel.ttf", 24)
-    rect_estadisticas = pg.Rect(width*0.01, height/9.5, width, height)
+    rect_estadisticas = pg.Rect(width*0.25, height * 0.25, width, height)
 
     volver_button = font_button.render("VOLVER", True, BLACK)
     volver_button_rect = volver_button.get_rect()
@@ -506,7 +506,7 @@ def estadisticas():
                         rect_estadisticas, BLACK, None, justification=0)
         screen.blit(volver_button, volver_button_rect)
         pg.draw.line(screen, BLACK, (volver_button_rect.x, volver_button_rect.y + 30),
-                     (volver_button_rect.x + width/12.5, volver_button_rect.y + 30), 3)
+                     (volver_button_rect.x + width * 0.057, volver_button_rect.y + 30), 3)
 
         pg.display.flip()
 
@@ -808,3 +808,4 @@ def game(sw, paused, start_time, elapsed_time, cell_size, totalBees):
 
 
 menu_principal(cell_size, 0)
+
