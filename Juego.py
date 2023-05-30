@@ -237,8 +237,8 @@ border_width = 10
 pg.init()
 width = 1920
 height = 1080
-screen = pg.display.set_mode((width, height), pg.RESIZABLE)
-screen1 = pg.display.set_mode((1920, 1080))
+screen = pg.display.set_mode((width, height), pg.HWSURFACE)
+screen1 = pg.display.set_mode((width, height), pg.HWSURFACE)
 fondo = pg.image.load("FondoPrincipal.jpg").convert()
 screen = pg.display.get_surface()
 fondo = pg.transform.scale(fondo, (width, height))
@@ -549,30 +549,25 @@ def render_textrect(text, font, rect, text_color, background_color, justificatio
 def resumen(tiempo_completado, aux, cell_size, totalBees):
     # Crear los rectángulos para los elementos
     rect_felicidades = pg.Rect(100, 200, width - 200, 100)
-    rect_tiempo = pg.Rect(100, rect_felicidades.bottom + 20, width - 200, 50)
-    rect_nombre = pg.Rect(100, rect_tiempo.bottom + 20, width - 200, 50)
-    rect_volver = pg.Rect(100, rect_nombre.bottom + 20, width - 200, 50)
+    rect_tiempo = pg.Rect(100, rect_felicidades.bottom + 80, width - 200, 50)
+    rect_nombre = pg.Rect(100, rect_tiempo.bottom + 80, width - 200, 50)
+    rect_volver = pg.Rect(100, rect_nombre.bottom + 80, width*0.25, 50)
+    rect_volver.centerx = width // 2
 
     # Variables para almacenar el nombre del jugador y el mensaje de felicitaciones
     nombre_jugador = ""
-    if aux == 1:
-        mensaje_felicidades = "Perdió"
-    else:
-        mensaje_felicidades = "¡Felicidades!"
-
-    # Banderas para controlar la entrada de texto del nombre
     nombre_ingresado = False
-    mostrar_cursor = False
-    cursor_timer = 0
+    
+    if aux == 1:
+        mensaje_felicidades = "Sigue Intentando..."
+    else:
+        mensaje_felicidades = "¡FELICIDADES!"
 
     while True:
         screen.blit(fondo, [0, 0])
 
-        # Dibujar los rectángulos en la pantalla
-        pg.draw.rect(screen, WHITE, rect_felicidades)
-        pg.draw.rect(screen, WHITE, rect_tiempo)
-        pg.draw.rect(screen, WHITE, rect_nombre)
-        pg.draw.rect(screen, WHITE, rect_volver)
+        # Renderizar los rectángulos
+        pg.draw.rect(screen, BLUE, rect_volver)
 
         # Renderizar el texto en los rectángulos
         texto_felicidades = font_button.render(
@@ -588,7 +583,8 @@ def resumen(tiempo_completado, aux, cell_size, totalBees):
             center=rect_felicidades.center))
         screen.blit(texto_tiempo, texto_tiempo.get_rect(
             center=rect_tiempo.center))
-        screen.blit(texto_nombre, texto_nombre.get_rect(
+        if aux != 1:
+            screen.blit(texto_nombre, texto_nombre.get_rect(
             center=rect_nombre.center))
         screen.blit(texto_volver, texto_volver.get_rect(
             center=rect_volver.center))
@@ -614,23 +610,8 @@ def resumen(tiempo_completado, aux, cell_size, totalBees):
                         nombre_jugador = nombre_jugador[:-1]
                     elif event.key == pg.K_RETURN:
                         nombre_ingresado = True
-                        mostrar_cursor = False
                     else:
                         nombre_jugador += event.unicode
-                        mostrar_cursor = True
-
-        """# Parpadeo del cursor si no se ha ingresado el nombre
-        if not nombre_ingresado:
-            cursor_timer += clock.get_time()
-            if cursor_timer >= 500:
-                cursor_timer %= 500
-                mostrar_cursor = not mostrar_cursor
-
-        if mostrar_cursor:
-            cursor_rect = pg.Rect(rect_nombre.left + texto_nombre.get_width() + 5, rect_nombre.top + 5, 2, rect_nombre.height - 10)
-            pg.draw.rect(screen, BLACK, cursor_rect)
-"""
-
 
 start_time = 0
 elapsed_time = 0
@@ -641,10 +622,6 @@ y = 380
 width_rect = 800
 height_rect = 500
 border_width = 10
-
-Whithe = (255, 255, 255)
-Black = (0, 0, 0)
-
 
 def guardar_registro(nombre, puntuacion):
     # Crear el registro con el formato "nombre,puntuacion"
@@ -704,11 +681,11 @@ def mode(cell_size):
                 sys.exit()
             if event.type == pg.MOUSEBUTTONDOWN:
                 if EASY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    totalBees = 70
+                    totalBees = 100
                     setup(cell_size, totalBees)
                     game(0, 0, 0, 0, cell_size, totalBees)
                 elif HARD_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    totalBees = 100
+                    totalBees = 150
                     setup(cell_size, totalBees)
                     game(0, 0, 0, 0, cell_size, totalBees)
 
@@ -808,4 +785,3 @@ def game(sw, paused, start_time, elapsed_time, cell_size, totalBees):
 
 
 menu_principal(cell_size, 0)
-
